@@ -3,6 +3,8 @@ from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.common.by import By
 import pytest
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class TestXueqiu:
@@ -48,10 +50,12 @@ class TestXueqiu:
         # 点击搜索结果
         self.driver.find_element(By.ID, "name").click()
         # 获取香港上市的阿里巴巴的股价
+        # stock_current_price = self.driver.find_element(By.XPATH,
+        #                                                '//*[@text="09988"]/../../..//*[contains(@resource-id,"current_price")]').text
         stock_current_price = self.driver.find_element(By.XPATH,
-                                                       '//*[@text="09988"]/../../..//*[contains(@resource-id,"current_price")]').text
+                                                       "//*[@text='BABA']/../../..//*[contains(@resource-id,'current_price')]").text
         # 断言股价
-        assert float(stock_current_price) < 200.0
+        assert float(stock_current_price) == 194.00
 
     def test_addOption(self):
         # 点击输入框
@@ -78,6 +82,27 @@ class TestXueqiu:
         self.driver.find_element(By.XPATH, "//*[@text='行情']").click()
         self.driver.find_element(By.ID, "action_search").click()
         self.driver.find_element(By.XPATH, '//*[@text="取消"]').click()
+
+    def test_webview_native(self):
+        self.driver.find_element(By.XPATH, "//*[@text='交易' and contains(@resource-id,'tab_name')]").click()
+        self.driver.find_element(MobileBy.ACCESSIBILITY_ID, "A股开户").click()
+        self.driver.find_element(MobileBy.ACCESSIBILITY_ID, "输入11位手机号").send_keys("18200000000")
+        self.driver.find_element(MobileBy.ACCESSIBILITY_ID, "输入验证码").send_keys("9999")
+        self.driver.find_element(MobileBy.ACCESSIBILITY_ID, "立即开户").click()
+
+    def test_webview_context(self):
+        self.driver.find_element(By.XPATH, "//*[@text='交易' and contains(@resource-id,'tab_name')]").click()
+        print("打印pagesource:" + self.driver.page_source)
+        # print("打印window_handles" + self.driver.window_handles)
+
+        WebDriverWait(self.driver, 30).until(lambda x: len(self.driver.contexts) > 1)
+        self.driver.switch_to.context(self.driver.contexts[-1])
+        self.driver.find_element(By.CSS_SELECTOR, ".trade_home_info_3aI").click()
+        WebDriverWait(self.driver, 30).until(lambda x: len(self.driver.window_handles) > 3)
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+        phone = (By.ID, "phone-number")
+        WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located(phone))
+        self.driver.find_element(phone).send_keys("18200000000")
 
     def teardown(self):
         pass

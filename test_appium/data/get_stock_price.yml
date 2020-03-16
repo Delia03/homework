@@ -1,0 +1,3 @@
+- by: xpath
+  locator: "//*[@text='BABA']/../../..//*[contains(@resource-id,'current_price')]"
+  action: text

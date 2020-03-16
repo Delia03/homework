@@ -22,6 +22,7 @@ class APP(BasePage):
             caps['noRest'] = True
             caps['unicodeKeyBoard'] = True
             caps['resetKeyBoard'] = True
+            # caps['skipServerInstallation'] = True
             self._driver = webdriver.Remote('http://localhost:4723/wd/hub', caps)
             self._driver.implicitly_wait(2)
         else:

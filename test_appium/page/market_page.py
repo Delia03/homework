@@ -11,5 +11,5 @@ class MarketPage(BasePage):
     def search(self):
         # search_locator = (By.ID, "action_search")
         # self.find(search_locator).click()
-        self.steps("../page/search.yml")
+        self.steps("../data/search.yml")
         return SearchPage(self._driver)

@@ -15,27 +15,50 @@ class BasePage:
 
     """当有广告、评价等各种场景出现时，要进行异常情况处理"""
 
+    # def find(self, by, locator=None):
+    #     try:
+    #         element = self._driver.find_element(*by) if isinstance(by, tuple) else self._driver.find_element(
+    #             by, locator)
+    #         # element = self._driver.find_element(*by)
+    #         # 成功找到元素后，将错误次数清零
+    #         self._error_count = 0
+    #         return element
+    #     except Exception as e:
+    #         # 如果错误次数大于设定最大错误次数，直接报错
+    #         if self._error_count >= self._max_error_count:
+    #             raise e
+    #         # 记录循环次数
+    #         self._error_count += 1
+    #         # 在黑名单中遍历
+    #         for black_element in self._black_list:
+    #             elements = self._driver.find_elements(*black_element)
+    #             if len(elements) > 0:
+    #                 elements[0].click()
+    #                 break
+    #         return self.find(by, locator)
+    def deal_exception(function):
+        def warp(self, *args, **kw):
+            try:
+                elment = function(self, *args, **kw)
+                self._error_count = 0
+                return elment
+            except Exception as e:
+                if self._error_count >= self._max_error_count:
+                    raise e
+                self._error_count += 1
+                for black in self._black_list:
+                    elments = self._driver.find_elements(*black)
+                    if len(elments) > 0:
+                        elments[0].click()
+                        break
+                return function(self, *args, **kw)
+
+        return warp
+
+    @deal_exception
     def find(self, by, locator=None):
-        try:
-            element = self._driver.find_element(*by) if isinstance(by, tuple) else self._driver.find_element(
-                by, locator)
-            # element = self._driver.find_element(*by)
-            # 成功找到元素后，将错误次数清零
-            self._error_count = 0
-            return element
-        except Exception as e:
-            # 如果错误次数大于设定最大错误次数，直接报错
-            if self._error_count >= self._max_error_count:
-                raise e
-            # 记录循环次数
-            self._error_count += 1
-            # 在黑名单中遍历
-            for black_element in self._black_list:
-                elements = self._driver.find_elements(*black_element)
-                if len(elements) > 0:
-                    elements[0].click()
-                    break
-            return self.find(by, locator)
+        element = self._driver.find_element(*by) if isinstance(by, tuple) else self._driver.find_element(by, locator)
+        return element
 
     def send(self, value, by, locator=None):
         try:
@@ -63,6 +86,10 @@ class BasePage:
                 if "action" in step.keys():
                     if "click" == step["action"]:
                         element.click()
+                    if "text" == step["action"]:
+                        print("打印")
+                        element.text
+                        print(element.text)
                     if "send" == step["action"]:
                         content: str = step["value"]
                         for param in self._params:

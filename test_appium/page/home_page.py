@@ -13,15 +13,15 @@ class HomePage(BasePage):
         """进入搜索页"""
         # search_locator = (By.ID, "tv_search")
         # self.find(search_locator).click()
-        self.steps("../page/goto_search.yml")
+        self.steps("../data/goto_search.yml")
         return SearchPage(self._driver)
 
     def goto_my_page(self):
-        self.steps("../page/goto_my.yml")
+        self.steps("../data/goto_my.yml")
         return MyPage(self._driver)
 
     def goto_market_page(self):
         # market_locator = (By.XPATH, '//*[@text="行情"]')
         # self.find(market_locator).click()
-        self.steps("../page/goto_market.yml")
+        self.steps("../data/goto_market.yml")
         return MarketPage(self._driver)
